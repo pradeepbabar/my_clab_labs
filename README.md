@@ -26,10 +26,11 @@ The AI Agent runs externally, constantly monitoring the health of the primary li
 * Python 3.8+
 * A free [Google Gemini API Key](https://aistudio.google.com/)
 
+![Screenshot 2026-04-02 000553](https://github.com/user-attachments/assets/87fab705-4bbf-4397-91d4-79926ace7859)
+
+
 ### 1. Deploy the Network Topology
 Spin up the virtual routers using Containerlab:
 ```bash
 sudo clab deploy -t topology.clab.yml
-
-![Screenshot 2026-04-02 000553](https://github.com/user-attachments/assets/e073156b-825c-46d2-9d03-afeb967b25a1)
 
