@@ -30,4 +30,6 @@ The AI Agent runs externally, constantly monitoring the health of the primary li
 Spin up the virtual routers using Containerlab:
 ```bash
 sudo clab deploy -t topology.clab.yml
-![Screenshot 2026-04-02 000553](https://github.com/user-attachments/assets/e9feb98f-2c37-44b3-88bb-aee746d40859)
+
+![Screenshot 2026-04-02 000553](https://github.com/user-attachments/assets/e073156b-825c-46d2-9d03-afeb967b25a1)
+
