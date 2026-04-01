@@ -15,7 +15,7 @@ The AI Agent runs externally, constantly monitoring the health of the primary li
 * **Generative AI Decision Engine**: Uses `gemini-2.5-flash` to evaluate complex network states (packet loss and latency) rather than nested `if/else` logic.
 * **Dynamic Route Manipulation**: Automatically injects and removes IP routes to reroute traffic seamlessly.
 * **Real-time Telemetry Parsing**: Extracts ICMP metrics directly from Alpine Linux network interfaces.
-* **Stateful Failback**: The AI understands when a link has stabilized and safely returns traffic to the primary path.![Screenshot 2026-04-02 000553](https://github.com/user-attachments/assets/e9feb98f-2c37-44b3-88bb-aee746d40859)
+* **Stateful Failback**: The AI understands when a link has stabilized and safely returns traffic to the primary path.
 
 
 ## 🚀 Getting Started
@@ -30,5 +30,4 @@ The AI Agent runs externally, constantly monitoring the health of the primary li
 Spin up the virtual routers using Containerlab:
 ```bash
 sudo clab deploy -t topology.clab.yml
-
-<img width="1914" height="1049" alt="image" src="https://github.com/user-attachments/assets/c7231cbc-1094-46e0-8421-09132013c572" />
+![Screenshot 2026-04-02 000553](https://github.com/user-attachments/assets/e9feb98f-2c37-44b3-88bb-aee746d40859)
