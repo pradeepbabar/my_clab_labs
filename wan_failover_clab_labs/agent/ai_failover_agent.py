@@ -61,11 +61,17 @@ def get_ping_metrics(container, target_ip):
     loss_match = re.search(r'(\d+)% packet loss', out)
     packet_loss = int(loss_match.group(1)) if loss_match else 100
     
-    # Parse latency (avg)
-    rtt_match = re.search(r'rtt min/avg/max/mdev = [\d\.]+/(.*?)/', out)
-    avg_latency = float(rtt_match.group(1)) if rtt_match else 999.0
+    # Parse latency (Fixed regex to support Alpine Linux in the FRR container)
+    rtt_match = re.search(r'min/avg/max.*? = [\d\.]+/(.*?)/', out)
     
+    if packet_loss == 100:
+        avg_latency = 0.0  # Latency doesn't exist if all packets drop
+    else:
+        avg_latency = float(rtt_match.group(1)) if rtt_match else 999.0
+        
     return packet_loss, avg_latency
+
+
 
 def execute_routing_change(action):
     """Executes the physical routing changes based on AI decisions."""
@@ -94,32 +100,28 @@ def execute_routing_change(action):
         state["active_link"] = "primary"
 
 def ask_ai_for_decision(packet_loss, latency):
-    """Prompts the LLM with network state to make a routing decision."""
+    """Prompts the LLM with strict boolean logic to force the correct routing decision."""
     prompt = f"""
-    You are an expert autonomous network reliability agent.
-    
-    Current State:
+    You are a strictly logical network routing AI. Read the State and apply the Rules precisely.
+
+    State:
     - Active Link: {state['active_link']}
-    - Primary Link Packet Loss: {packet_loss}%
-    - Primary Link Average Latency: {latency} ms
-    
+    - Packet Loss: {packet_loss}%
+    - Latency: {latency} ms
+
     Rules:
-    1. If the Active Link is 'primary' and packet loss is high (>50%) or latency is severe (>300ms), you must switch to the backup link.
-    2. If the Active Link is 'backup' and the primary link has recovered (0% packet loss and latency < 100ms), you should switch back to the primary link.
-    3. Otherwise, keep things as they are.
-    
-    Based on the current state, output exactly ONE word indicating your decision:
-    - "FAILOVER" (if we need to move to backup)
-    - "FAILBACK" (if we need to move to primary)
-    - "STAY" (if no changes are needed)
-    
-    Do not output any other text.
+    - Return "FAILOVER" if Active Link is 'primary' AND (Packet Loss >= 50 OR Latency >= 300).
+    - Return "FAILBACK" if Active Link is 'backup' AND (Packet Loss == 0 AND Latency < 100).
+    - Return "STAY" for any other condition.
+
+    Based on the Rules, output exactly ONE word (FAILOVER, FAILBACK, or STAY):
     """
     
     try:
         response = model.generate_content(prompt)
         decision = response.text.strip().upper()
-        # Clean up in case the AI added punctuation
+        
+        # Parse the strict output
         if "FAILOVER" in decision: return "FAILOVER"
         if "FAILBACK" in decision: return "FAILBACK"
         return "STAY"
