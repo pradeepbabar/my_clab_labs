@@ -1,0 +1,117 @@
+{
+  "name": "wan-failover",
+  "type": "clab",
+  "clab": {
+    "config": {
+      "prefix": "clab",
+      "mgmt": {
+        "network": "clab",
+        "bridge": "br-c313d428e49a",
+        "ipv4-subnet": "172.20.20.0/24",
+        "ipv4-gw": "172.20.20.1",
+        "ipv6-subnet": "3fff:172:20:20::/64",
+        "ipv6-gw": "3fff:172:20:20::1",
+        "external-access": true
+      }
+    }
+  },
+  "ssh-pub-keys": [],
+  "nodes": {
+    "router1": {
+      "index": "0",
+      "shortname": "router1",
+      "longname": "clab-wan-failover-router1",
+      "fqdn": "router1.wan-failover.io",
+      "group": "",
+      "labdir": "/home/sarika/my_clab_labs/wan_failover_clab_labs/clab-wan-failover/router1",
+      "kind": "linux",
+      "image": "frrouting/frr:latest",
+      "mgmt-net": "",
+      "mgmt-intf": "",
+      "mgmt-ipv4-address": "172.20.20.2",
+      "mgmt-ipv4-prefix-length": 24,
+      "mgmt-ipv6-address": "3fff:172:20:20::2",
+      "mgmt-ipv6-prefix-length": 64,
+      "mac-address": "",
+      "labels": {
+        "clab-mgmt-net-bridge": "br-c313d428e49a",
+        "clab-node-group": "",
+        "clab-node-kind": "linux",
+        "clab-node-lab-dir": "/home/sarika/my_clab_labs/wan_failover_clab_labs/clab-wan-failover/router1",
+        "clab-node-longname": "clab-wan-failover-router1",
+        "clab-node-name": "router1",
+        "clab-node-type": "",
+        "clab-owner": "sarika",
+        "clab-topo-file": "/home/sarika/my_clab_labs/wan_failover_clab_labs/topology.clab.yml",
+        "containerlab": "wan-failover"
+      },
+      "port-bindings": [
+      ]
+    },
+    "router2": {
+      "index": "1",
+      "shortname": "router2",
+      "longname": "clab-wan-failover-router2",
+      "fqdn": "router2.wan-failover.io",
+      "group": "",
+      "labdir": "/home/sarika/my_clab_labs/wan_failover_clab_labs/clab-wan-failover/router2",
+      "kind": "linux",
+      "image": "frrouting/frr:latest",
+      "mgmt-net": "",
+      "mgmt-intf": "",
+      "mgmt-ipv4-address": "172.20.20.3",
+      "mgmt-ipv4-prefix-length": 24,
+      "mgmt-ipv6-address": "3fff:172:20:20::3",
+      "mgmt-ipv6-prefix-length": 64,
+      "mac-address": "",
+      "labels": {
+        "clab-mgmt-net-bridge": "br-c313d428e49a",
+        "clab-node-group": "",
+        "clab-node-kind": "linux",
+        "clab-node-lab-dir": "/home/sarika/my_clab_labs/wan_failover_clab_labs/clab-wan-failover/router2",
+        "clab-node-longname": "clab-wan-failover-router2",
+        "clab-node-name": "router2",
+        "clab-node-type": "",
+        "clab-owner": "sarika",
+        "clab-topo-file": "/home/sarika/my_clab_labs/wan_failover_clab_labs/topology.clab.yml",
+        "containerlab": "wan-failover"
+      },
+      "port-bindings": [
+      ]
+    }
+  },
+  "links": [
+    {
+      "endpoints": {
+        "a": {
+          "node": "router1",
+          "interface": "eth1",
+          "mac": "aa:c1:ab:e2:28:2d",
+          "peer": "z"
+        },
+        "z": {
+          "node": "router2",
+          "interface": "eth1",
+          "mac": "aa:c1:ab:76:50:14",
+          "peer": "a"
+        }
+      }
+    },
+    {
+      "endpoints": {
+        "a": {
+          "node": "router1",
+          "interface": "eth2",
+          "mac": "aa:c1:ab:cf:e9:10",
+          "peer": "z"
+        },
+        "z": {
+          "node": "router2",
+          "interface": "eth2",
+          "mac": "aa:c1:ab:4b:30:93",
+          "peer": "a"
+        }
+      }
+    }
+  ]
+}

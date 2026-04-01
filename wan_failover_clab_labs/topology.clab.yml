@@ -1,0 +1,31 @@
+name: wan-failover
+
+topology:
+  nodes:
+    router1:
+      kind: linux
+      image: frrouting/frr:latest
+      binds:
+        - configs/router1/frr.conf:/etc/frr/frr.conf
+        - configs/router1/daemons:/etc/frr/daemons
+      exec:
+        - ip addr add 10.0.0.1/30 dev eth1
+        - ip addr add 10.0.1.1/30 dev eth2
+        - ip addr add 192.168.1.1/24 dev eth0
+        - /usr/lib/frr/frrinit.sh start
+
+    router2:
+      kind: linux
+      image: frrouting/frr:latest
+      binds:
+        - configs/router2/frr.conf:/etc/frr/frr.conf
+        - configs/router2/daemons:/etc/frr/daemons
+      exec:
+        - ip addr add 10.0.0.2/30 dev eth1
+        - ip addr add 10.0.1.2/30 dev eth2
+        - ip addr add 192.168.2.1/24 dev eth0
+        - /usr/lib/frr/frrinit.sh start
+
+  links:
+    - endpoints: ["router1:eth1", "router2:eth1"]   # WAN Link 1 PRIMARY
+    - endpoints: ["router1:eth2", "router2:eth2"]   # WAN Link 2 BACKUP

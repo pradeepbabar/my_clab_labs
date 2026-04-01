@@ -1,0 +1,4 @@
+agent/venv/
+logs/
+agent/config.yaml
+*.pyc
