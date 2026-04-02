@@ -11,13 +11,12 @@ import logging
 import re
 import os
 import google.generativeai as genai
-from datetime import datetime
 
 # ── Setup AI Agent ──────────────────────────────────────
 # Ensure you export your API key in your terminal before running:
 # export GEMINI_API_KEY="your_api_key_here"
 genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('gemini-2.5-flash')
 
 # ── Logging setup ──────────────────────────────────────
 logging.basicConfig(
@@ -31,10 +30,14 @@ log = logging.getLogger(__name__)
 CONFIG = {
     "primary_link": {"name": "WAN-LINK-1-PRIMARY", "router1_ip": "10.0.0.1", "router2_ip": "10.0.0.2"},
     "backup_link": {"name": "WAN-LINK-2-BACKUP", "router1_ip": "10.0.1.1", "router2_ip": "10.0.1.2"},
-    "router1_container": "clab-wan-failover-router1",
-    "router2_container": "clab-wan-failover-router2",
-    "destination_network": "192.168.2.0/24",
-    "check_interval": 10,  # Increased slightly to give AI time to think
+    "router1_container": "clab-wan-failover-router1",  # Hub Router
+    "router2_container": "clab-wan-failover-router2",  # Spoke Router
+    
+    # Internal LAN Subnets based on topology diagram
+    "hub_lan": "172.16.11.0/24",     
+    "spoke_lan": "192.168.10.0/24",  
+    
+    "check_interval": 10,  
     "ping_count": 3,
     "ping_timeout": 2,
 }
@@ -71,32 +74,42 @@ def get_ping_metrics(container, target_ip):
         
     return packet_loss, avg_latency
 
-
-
 def execute_routing_change(action):
     """Executes the physical routing changes based on AI decisions."""
     r1 = CONFIG["router1_container"]
     r2 = CONFIG["router2_container"]
-    dest = CONFIG["destination_network"]
+    
+    hub_lan = CONFIG["hub_lan"]
+    spoke_lan = CONFIG["spoke_lan"]
     
     primary_gw_r1, backup_gw_r1 = CONFIG["primary_link"]["router2_ip"], CONFIG["backup_link"]["router2_ip"]
     primary_gw_r2, backup_gw_r2 = CONFIG["primary_link"]["router1_ip"], CONFIG["backup_link"]["router1_ip"]
 
     if action == "FAILOVER" and state["active_link"] == "primary":
         log.warning("🤖 AI AGENT TRIGGERED FAILOVER TO BACKUP!")
-        run_in_container(r1, f"ip route del {dest} via {primary_gw_r1}")
-        run_in_container(r1, f"ip route add {dest} via {backup_gw_r1} metric 5")
-        run_in_container(r2, f"ip route del 192.168.1.0/24 via {primary_gw_r2}")
-        run_in_container(r2, f"ip route add 192.168.1.0/24 via {backup_gw_r2} metric 5")
+        
+        # 1. Update Hub Router (r1) to reach Spoke LAN via Backup Link
+        run_in_container(r1, f"ip route del {spoke_lan} via {primary_gw_r1}")
+        run_in_container(r1, f"ip route add {spoke_lan} via {backup_gw_r1} metric 5")
+        
+        # 2. Update Spoke Router (r2) to reach Hub LAN via Backup Link
+        run_in_container(r2, f"ip route del {hub_lan} via {primary_gw_r2}")
+        run_in_container(r2, f"ip route add {hub_lan} via {backup_gw_r2} metric 5")
+        
         state["active_link"] = "backup"
         state["total_failovers"] += 1
 
     elif action == "FAILBACK" and state["active_link"] == "backup":
         log.info("🤖 AI AGENT TRIGGERED FAILBACK TO PRIMARY!")
-        run_in_container(r1, f"ip route del {dest} via {backup_gw_r1}")
-        run_in_container(r1, f"ip route add {dest} via {primary_gw_r1} metric 10")
-        run_in_container(r2, f"ip route del 192.168.1.0/24 via {backup_gw_r2}")
-        run_in_container(r2, f"ip route add 192.168.1.0/24 via {primary_gw_r2} metric 10")
+        
+        # 1. Restore Hub Router (r1) to reach Spoke LAN via Primary Link
+        run_in_container(r1, f"ip route del {spoke_lan} via {backup_gw_r1}")
+        run_in_container(r1, f"ip route add {spoke_lan} via {primary_gw_r1} metric 10")
+        
+        # 2. Restore Spoke Router (r2) to reach Hub LAN via Primary Link
+        run_in_container(r2, f"ip route del {hub_lan} via {backup_gw_r2}")
+        run_in_container(r2, f"ip route add {hub_lan} via {primary_gw_r2} metric 10")
+        
         state["active_link"] = "primary"
 
 def ask_ai_for_decision(packet_loss, latency):
