@@ -2,6 +2,7 @@ name: wan-failover
 
 topology:
   nodes:
+    # --- ROUTERS ---
     router1:
       kind: linux
       image: frrouting/frr:latest
@@ -11,7 +12,7 @@ topology:
       exec:
         - ip addr add 10.0.0.1/30 dev eth1
         - ip addr add 10.0.1.1/30 dev eth2
-        - ip addr add 172.16.11.1/24 dev eth3   # NEW: Hub LAN Gateway
+        - ip addr add 172.16.11.1/24 dev eth3   # Gateway for Hub Server
         - /usr/lib/frr/frrinit.sh start
 
     router2:
@@ -23,10 +24,10 @@ topology:
       exec:
         - ip addr add 10.0.0.2/30 dev eth1
         - ip addr add 10.0.1.2/30 dev eth2
-        - ip addr add 192.168.10.1/24 dev eth3  # NEW: Spoke LAN Gateway
+        - ip addr add 192.168.10.1/24 dev eth3  # Gateway for Spoke Host
         - /usr/lib/frr/frrinit.sh start
 
-    # --- NEW ENDPOINTS ---
+    # --- ENDPOINTS (from your diagram) ---
     hub-server:
       kind: linux
       image: alpine:latest
@@ -41,8 +42,9 @@ topology:
         - ip addr add 192.168.10.9/24 dev eth1
         - ip route add default via 192.168.10.1
 
+  # --- CABLING / LINKS ---
   links:
     - endpoints: ["router1:eth1", "router2:eth1"]       # WAN Link 1 PRIMARY
     - endpoints: ["router1:eth2", "router2:eth2"]       # WAN Link 2 BACKUP
-    - endpoints: ["router1:eth3", "hub-server:eth1"]    # Hub LAN
-    - Alpine-endpoints: ["router2:eth3", "spoke-host:eth1"] # Spoke LAN
+    - endpoints: ["router1:eth3", "hub-server:eth1"]    # Internal Hub LAN
+    - endpoints: ["router2:eth3", "spoke-host:eth1"]    # Internal Spoke LAN
