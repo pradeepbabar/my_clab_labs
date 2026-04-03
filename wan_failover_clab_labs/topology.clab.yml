@@ -12,7 +12,7 @@ topology:
       exec:
         - ip addr add 10.0.0.1/30 dev eth1
         - ip addr add 10.0.1.1/30 dev eth2
-        - ip addr add 172.16.11.1/24 dev eth3   # Gateway for Hub Server
+        - ip addr add 172.16.11.1/24 dev eth3   
         - /usr/lib/frr/frrinit.sh start
 
     router2:
@@ -24,10 +24,10 @@ topology:
       exec:
         - ip addr add 10.0.0.2/30 dev eth1
         - ip addr add 10.0.1.2/30 dev eth2
-        - ip addr add 192.168.10.1/24 dev eth3  # Gateway for Spoke Host
+        - ip addr add 192.168.10.1/24 dev eth3  
         - /usr/lib/frr/frrinit.sh start
 
-    # --- ENDPOINTS (from your diagram) ---
+    # --- ENDPOINTS ---
     hub-server:
       kind: linux
       image: alpine:latest
