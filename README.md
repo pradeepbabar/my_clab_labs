@@ -121,7 +121,5 @@ When you are done testing, you can destroy the lab environment to free up system
 ```bash
 sudo clab destroy -t topology.clab.yml
 ```
+<img width="1881" height="966" alt="Screenshot 2026-04-03 003711" src="https://github.com/user-attachments/assets/c245f192-3acb-4ce5-83c3-43e776a4b2c3" />
 
-## 📜 License
-This project is licensed under the [GNU General Public License v3.0](LICENSE).
-```
