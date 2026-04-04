@@ -1,3 +1,4 @@
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/12370/badge)](https://www.bestpractices.dev/projects/12370)
 ```markdown
 # 🤖 AI-Driven WAN Failover Agent
 
