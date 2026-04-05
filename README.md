@@ -1,4 +1,6 @@
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/12370/badge)](https://www.bestpractices.dev/projects/12370)
+![Profile Views](https://komarev.com/ghpvc/?username=pradeepbabar\&label=Profile%20Views\&color=0e75b6\&style=flat)
+
 ```markdown
 # 🤖 AI-Driven WAN Failover Agent
 
