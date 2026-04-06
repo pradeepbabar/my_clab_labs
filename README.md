@@ -1,5 +1,3 @@
-
-[![GitHub](https://img.shields.io/badge/GitHub-pradeepbabar31-black?logo=github\&logoColor=white)](https://github.com/pradeepbabar/my_clab_labs)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/12370/badge)](https://www.bestpractices.dev/projects/12370)
 ![Profile Views](https://komarev.com/ghpvc/?username=pradeepbabar\&label=Profile%20Views\&color=0e75b6\&style=flat)
 
